@@ -1,0 +1,23 @@
+name: Run Go Integration Tests
+on: [push]
+jobs:
+  go-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.13
+      - uses: hashicorp/setup-terraform@v1.2.1
+        with:
+          terraform_version: 1.0.3
+          terraform_wrapper: false
+      - name: Download Go Modules
+        run: go mod download
+        working-directory: static-website/test/
+      - name: Run Go Tests
+        run: go test -v -tags=integration
+        working-directory: static-website/test/
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
